@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trucker Job - Cyber Terminal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+    <div id="ui-wrapper">
+        <div class="main">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="nav-item active" data-page="jobsPage">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>DATABASE</span>
+                </div>
+                <div class="nav-item" data-page="convoyPage">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <span>NETWORK</span>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <!-- Header HUD -->
+                <div class="topWrapper">
+                    <div class="topWrapper-jobName">
+                        <div class="iconLogo"><i class="fa-solid fa-truck-front"></i></div>
+                        <div class="jobText">LOGISTICS_HUB</div>
+                        <div class="playerName">ID: <span id="playerName">UNIDENTIFIED</span></div>
+                    </div>
+
+                    <div class="rightTopWrapper">
+                        <div class="level">
+                            <div class="levelText" id="levelText">RANK 01 — 0/100</div>
+                            <div class="levelProg"><div class="levelStatus" id="levelStatus"></div></div>
+                        </div>
+                        <div class="topWrapper-close" id="closeBtn">
+                            <div class="closeIcon"><i class="fa-solid fa-power-off"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jobs Terminal -->
+                <div id="jobsPage" class="page-container">
+                    <div class="filter-hud">
+                        <div class="search-terminal">
+                            <i class="fa-solid fa-terminal"></i>
+                            <input type="text" id="trailerInput" placeholder="SCAN_DATABASE_FOR_CONTRACTS...">
+                        </div>
+                        <div class="filter-btn filterMenu">SORT_BY_VALUE</div>
+                    </div>
+                    <div class="listArea" id="jobListArea"></div>
+                </div>
+
+                <!-- Convoy Terminal -->
+                <div id="convoyPage" class="page-container" style="display: none;">
+                    <div id="convoyAuth" class="convoy-grid">
+                        <div class="convoy-box">
+                            <div class="trailerName">HOST_SESSION</div>
+                            <p class="trailerType">ENCRYPT A PRIVATE LINK FOR YOUR CREW</p>
+                            <div id="generatedID" class="trailerPrice">----</div>
+                            <!-- FIXED: Added 'confirm' class for shape -->
+                            <div id="createConvoyBtn" class="confirm">ESTABLISH_LINK</div>
+                        </div>
+                        <div class="convoy-box">
+                            <div class="trailerName">JOIN_SESSION</div>
+                            <p class="trailerType">INPUT SECTOR FREQUENCY TO SYNC</p>
+                            <input type="number" class="convoy-input-field" id="joinIDInput" placeholder="0000">
+                            <!-- FIXED: Added 'confirm' class for shape -->
+                            <div id="joinConvoyBtn" class="confirm">SYNC_SIGNAL</div>
+                        </div>
+                    </div>
+
+                    <div id="convoyLobby" style="display: none;">
+                        <div class="lobby-header">
+                            <div class="lobby-title">SIGNAL_ID: <span id="activeConvoyID">#0000</span></div>
+                            <div id="leaveConvoyBtn" class="leave-btn">DISCONNECT</div>
+                        </div>
+                        <div class="lobby-content">
+                            <div class="lobby-panel">
+                                <div class="panel-header">ACTIVE_SIGNALS</div>
+                                <div id="playerList" class="player-scroll"></div>
+                            </div>
+                            <div class="lobby-panel">
+                                <div class="panel-header">TARGET_DATA</div>
+                                <div id="lobbyMissionInfo" class="mission-details">
+                                    <div class="no-mission">WAITING_FOR_UPLINK...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PopUp: Corrected Buttons -->
+        <div class="popUp">
+            <div class="popUpText">AUTHORIZE CONTRACT?</div>
+            <div class="popUpButtons">
+                <!-- Both buttons now share 'tactical-btn' class for equal layout -->
+                <div id="cancel" class="tactical-btn reject">REJECT</div>
+                <div id="confirm" class="tactical-btn accept">ACCEPT</div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

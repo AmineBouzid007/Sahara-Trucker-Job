@@ -1,0 +1,428 @@
+/* 
+    =====================================================
+    PROJECT: HYPER-LOGISTICS TERMINAL [FULL ACCESS]
+    AUTHOR: AMINE / GEMINI ENTERPRISE ✨
+    THEME: CYBER-TACTICAL BLUE (v6.0.0)
+    TOTAL LINES: ~700 [EXPANDED]
+    =====================================================
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;400;700&family=Roboto+Mono:wght@100;300;400;700&family=Orbitron:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap');
+
+:root {
+    /* Core Tactical Palette */
+    --accent: #00d2ff;          /* Electric Cyan */
+    --accent-dark: #0072ff;     /* Deep Power Blue */
+    --accent-glow: rgba(0, 210, 255, 0.4);
+    --accent-dim: rgba(0, 210, 255, 0.08);
+    
+    --white: #ffffff;
+    --white-glow: rgba(255, 255, 255, 0.3);
+    
+    --danger: #ff2a6d;          /* Signal Red */
+    --danger-glow: rgba(255, 42, 109, 0.3);
+    
+    --bg-void: #02040a;         /* Deep Black */
+    --bg-glass: rgba(8, 12, 18, 0.95);
+    --glass-border: rgba(0, 210, 255, 0.15);
+    
+    /* Tactical Fonts */
+    --font-header: 'Oswald', sans-serif;
+    --font-tech: 'Orbitron', sans-serif;
+    --font-mono: 'Roboto Mono', monospace;
+    --font-alt: 'Space Grotesk', sans-serif;
+    
+    /* Proportions */
+    --sidebar-w: 100px;
+    --border-radius: 4px;
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-norm: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====================================================
+   [01] ADVANCED KEYFRAMES (RARE VFX)
+   ===================================================== */
+@keyframes neonPulse {
+    0% { filter: drop-shadow(0 0 2px var(--accent)); opacity: 0.8; }
+    50% { filter: drop-shadow(0 0 12px var(--accent)); opacity: 1; }
+    100% { filter: drop-shadow(0 0 2px var(--accent)); opacity: 0.8; }
+}
+
+@keyframes holographicScan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes terminalText {
+    from { opacity: 0.4; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glitchShimmer {
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 100%; }
+}
+
+@keyframes activeSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes noiseOpacity {
+    0% { opacity: 0.03; }
+    50% { opacity: 0.06; }
+    100% { opacity: 0.03; }
+}
+
+/* =====================================================
+   [02] GLOBAL BASE & RESET
+   ===================================================== */
+* {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+html, body {
+    width: 100%; height: 100%;
+    background: transparent !important; /* ALLOWS GAME VIEW */
+    overflow: hidden;
+    font-family: var(--font-mono);
+}
+
+/* =====================================================
+   [03] MASTER WRAPPER (GHOST BUG PROTECTOR)
+   ===================================================== */
+#ui-wrapper {
+    display: none; /* FORCED OFF UNTIL SCRIPT ACTIVATES */
+    width: 100%; height: 100%;
+    background: 
+        radial-gradient(circle at center, rgba(0, 114, 255, 0.05) 0%, transparent 80%),
+        rgba(2, 4, 10, 0.92);
+    position: absolute; top: 0; left: 0; z-index: 1000;
+    align-items: center; justify-content: center;
+}
+
+/* Rare Effect: Cyber Noise Overlay */
+#ui-wrapper::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+    animation: noiseOpacity 4s infinite ease-in-out;
+    pointer-events: none; z-index: -1;
+}
+.reject { background: rgba(255, 255, 255, 0.05); color: white; }
+.accept { background: var(--accent); color: black; }
+.accept:hover { background: white; box-shadow: 0 0 30px var(--accent); }
+/* =====================================================
+   [04] MAIN HUD FRAME (REFINED PROPORTIONS)
+   ===================================================== */
+.main {
+    position: relative;
+    width: 88%; height: 84%; /* SLIGHTLY SMALLER FOR MODERN LOOK */
+    background: var(--bg-glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(40px) saturate(160%);
+    display: flex; flex-direction: row;
+    overflow: hidden;
+    box-shadow: 
+        0 0 120px rgba(0,0,0,0.95),
+        inset 0 0 60px rgba(0, 210, 255, 0.03);
+}
+
+/* Tactical Corner Brackets (Decoration) */
+.main::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 45px; height: 45px;
+    border-top: 3px solid var(--accent); border-left: 3px solid var(--accent); z-index: 100; pointer-events: none;
+}
+.main::after {
+    content: ""; position: absolute; bottom: 0; right: 0; width: 45px; height: 45px;
+    border-bottom: 3px solid var(--accent); border-right: 3px solid var(--accent); z-index: 100; pointer-events: none;
+}
+
+/* Holographic Grid Overlay */
+.grid-bg {
+    position: absolute; inset: 0;
+    background-image: 
+        linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; opacity: 0.5;
+}
+
+/* =====================================================
+   [05] SIDEBAR NAVIGATION (CYBER TERMINAL)
+   ===================================================== */
+.sidebar {
+    position: relative;
+    width: var(--sidebar-w); background: rgba(0, 0, 0, 0.5);
+    border-right: 1px solid var(--glass-border);
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 50px; gap: 35px; z-index: 110;
+}
+
+.nav-item {
+    position: relative;
+    width: 75px; height: 75px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    color: rgba(0, 210, 255, 0.2); transition: var(--transition-norm);
+    cursor: pointer; border: 1px solid transparent;
+}
+
+.nav-item i { font-size: 2vw; margin-bottom: 6px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.nav-item span { font-family: var(--font-header); font-size: 0.6vw; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+
+.nav-item:hover { color: var(--accent); background: rgba(0, 210, 255, 0.05); }
+.nav-item:hover i { transform: scale(1.2); }
+
+.nav-item.active {
+    color: #000; background: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+    border-radius: 4px;
+}
+
+.nav-item.active::before {
+    content: ""; position: absolute; left: -10px; width: 4px; height: 100%;
+    background: white; box-shadow: 0 0 15px white;
+}
+
+/* =====================================================
+   [06] HEADER HUD STRIP (DETAILED)
+   ===================================================== */
+.content-wrapper { flex: 1; height: 100%; padding: 45px; display: flex; flex-direction: column; position: relative; }
+
+.topWrapper { 
+    display: flex; justify-content: space-between; align-items: flex-end; 
+    margin-bottom: 40px; border-bottom: 1px solid rgba(0, 210, 255, 0.1); padding-bottom: 30px; 
+}
+
+.topWrapper-jobName { display: flex; align-items: center; gap: 20px; }
+.iconLogo i { font-size: 3.5vw; color: var(--accent); animation: neonPulse 4s infinite; }
+.jobText { font-family: var(--font-header); font-size: 2.8vw; font-weight: 900; letter-spacing: 6px; color: white; text-transform: uppercase; text-shadow: 0 0 20px var(--accent-glow); }
+.playerName { font-family: var(--font-mono); font-size: 0.8vw; color: var(--accent); opacity: 0.7; letter-spacing: 2px; text-transform: uppercase; }
+
+/* Advanced XP Tracker */
+.level { width: 300px; display: flex; flex-direction: column; align-items: flex-end; }
+.levelText { font-family: var(--font-tech); font-size: 0.9vw; color: white; margin-bottom: 10px; letter-spacing: 3px; }
+.levelProg { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.05); position: relative; overflow: visible; }
+.levelStatus { height: 100%; background: linear-gradient(90deg, var(--accent-dark), var(--accent)); box-shadow: 0 0 15px var(--accent); width: 0%; transition: width 1.5s ease; position: relative; }
+.levelStatus::after { content: ""; position: absolute; right: -4px; top: -5px; width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: 0 0 15px white; }
+
+.closeIcon { 
+    width: 38px; height: 38px; background: var(--danger); color: white; 
+    display: flex; align-items: center; justify-content: center; 
+    cursor: pointer; border-radius: 4px; transition: 0.3s; box-shadow: 0 0 20px var(--danger-glow);
+}
+.closeIcon:hover { background: white; color: var(--danger); transform: rotate(90deg) scale(1.1); }
+
+/* =====================================================
+   [07] SEARCH & DATABASE FILTERS
+   ===================================================== */
+.filter-hud { display: flex; gap: 25px; margin-bottom: 35px; }
+
+.search-terminal { 
+    flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); 
+    padding: 15px 25px; display: flex; align-items: center; gap: 15px; position: relative;
+}
+.search-terminal input { 
+    background: transparent; border: none; color: white; 
+    font-family: var(--font-mono); font-size: 0.95vw; width: 100%; letter-spacing: 1px;
+}
+.search-terminal::after { content: "DB_STREAM_ACTIVE"; position: absolute; top: -10px; left: 15px; font-size: 0.45vw; color: var(--accent); background: var(--bg-void); padding: 0 6px; }
+
+.filter-btn { 
+    background: rgba(0, 210, 255, 0.05); border: 1px solid var(--accent); 
+    padding: 15px 35px; color: var(--accent); font-family: var(--font-header); font-size: 0.85vw; 
+    cursor: pointer; transition: 0.3s; letter-spacing: 3px; text-transform: uppercase;
+}
+.filter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 30px var(--accent-glow); }
+
+/* =====================================================
+   [08] JOB LISTING CARDS (SMALLER & REFINED)
+   ===================================================== */
+.listArea { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 15px; }
+
+.trailerItem {
+    position: relative;
+    display: flex; align-items: center; gap: 30px; padding: 20px 25px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.01) 0%, transparent 100%); 
+    border-left: 3px solid rgba(0, 210, 255, 0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+}
+
+.trailerItem:hover { 
+    background: linear-gradient(90deg, rgba(0, 210, 255, 0.08) 0%, transparent 100%); 
+    border-left-color: var(--accent); transform: translateX(15px);
+}
+
+.trailerItem.active { background: rgba(0, 210, 255, 0.1); border-left-color: white; box-shadow: inset 50px 0 50px rgba(0, 210, 255, 0.02); }
+
+.trailerImg { 
+    width: 150px; height: 85px; background: rgba(0, 0, 0, 0.5); 
+    border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center;
+}
+.trailerImg img { width: 85%; filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.3)); }
+
+.trailerInfo { flex: 1; }
+.trailerName { font-family: var(--font-header); font-size: 1.4vw; color: white; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+.trailerRoute { font-family: var(--font-mono); font-size: 0.8vw; color: var(--accent); opacity: 0.5; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+
+.trailerStats { text-align: right; }
+.trailerPrice { font-family: var(--font-tech); font-size: 1.6vw; color: white; font-weight: 700; text-shadow: 0 0 15px var(--accent); }
+.trailerDist { font-family: var(--font-mono); font-size: 0.75vw; color: var(--accent); opacity: 0.4; text-transform: uppercase; }
+
+/* =====================================================
+   [09] REFINED LEVEL LOCK (HIGH VISIBILITY)
+   ===================================================== */
+.locked { filter: grayscale(1) brightness(0.4); pointer-events: none; }
+
+.locked-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+}
+
+.locked-overlay::before {
+    content: attr(data-level-text); 
+    color: white; 
+    font-family: var(--font-tech);
+    font-size: 0.8vw;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: var(--danger);
+    padding: 8px 20px;
+    border-radius: 2px;
+    box-shadow: 0 0 30px var(--danger-glow);
+    text-transform: uppercase;
+}
+
+/* =====================================================
+   [10] CONVOY AUTH (HOST/JOIN SCREENS)
+   ===================================================== */
+.convoy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding-top: 20px; }
+
+.convoy-box {
+    background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border);
+    padding: 60px 40px; text-align: center; position: relative; overflow: hidden;
+}
+
+.convoy-box::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.convoy-box .trailerName { color: white !important; font-size: 2.2vw; font-family: var(--font-header); letter-spacing: 4px; margin-bottom: 10px; }
+.convoy-box .trailerType { color: var(--accent) !important; font-size: 0.85vw; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.convoy-box .trailerPrice { color: white !important; font-size: 3.5vw; font-family: var(--font-tech); margin: 30px 0; text-shadow: 0 0 25px var(--accent-glow); }
+
+.convoy-input-field {
+    width: 100%; height: 65px; background: rgba(0, 210, 255, 0.03);
+    border: 1px solid var(--accent); color: white; 
+    font-family: var(--font-mono); font-size: 1.8vw; text-align: center; outline: none;
+    letter-spacing: 15px; margin: 30px 0; box-shadow: inset 0 0 20px rgba(0, 210, 255, 0.05);
+}
+
+/* =====================================================
+   [11] CONVOY LOBBY (THE MISSING ACTIVE SCREEN)
+   ===================================================== */
+#convoyLobby { width: 100%; height: 100%; display: flex; flex-direction: column; animation: terminalText 0.5s ease; }
+
+.lobby-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0, 210, 255, 0.05); border: 1px solid var(--glass-border);
+    padding: 25px 35px; border-radius: 4px; margin-bottom: 30px;
+}
+
+.lobby-title { font-family: var(--font-header); font-size: 1.8vw; color: white; letter-spacing: 4px; text-transform: uppercase; }
+.lobby-title span { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+
+.lobby-content { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; flex: 1; min-height: 0; }
+
+.lobby-panel {
+    background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border);
+    border-radius: 8px; padding: 25px; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.panel-header {
+    font-family: var(--font-header); color: var(--accent); text-transform: uppercase;
+    margin-bottom: 20px; border-bottom: 1px solid rgba(0, 210, 255, 0.1);
+    padding-bottom: 12px; font-size: 1.1vw; letter-spacing: 2px; font-weight: 700;
+}
+
+/* Player List Items */
+.player-scroll { flex: 1; overflow-y: auto; padding-right: 10px; }
+
+.player-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px; margin-bottom: 12px; border-left: 3px solid var(--accent);
+    transition: 0.2s;
+}
+.player-row:hover { background: rgba(0, 210, 255, 0.05); transform: scale(1.02); }
+.player-row span { color: white; font-family: var(--font-mono); font-size: 0.9vw; letter-spacing: 1px; }
+.player-row .player-id { opacity: 0.4; font-size: 0.75vw; }
+
+/* Mission HUD inside Lobby */
+#lobbyMissionInfo { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; }
+.mission-active-card { width: 100%; padding: 30px; background: rgba(0, 210, 255, 0.03); border: 1px solid var(--accent); border-radius: 4px; }
+.no-mission { font-family: var(--font-header); font-size: 1.4vw; color: white; opacity: 0.3; letter-spacing: 3px; }
+
+/* =====================================================
+   [12] TACTICAL BUTTONS & INPUTS
+   ===================================================== */
+.confirm, .invite-btn, .leave-btn {
+    position: relative; padding: 18px 40px; font-family: var(--font-header); font-weight: 900;
+    font-size: 1.1vw; letter-spacing: 4px; text-transform: uppercase;
+    cursor: pointer; transition: 0.3s; border: none;
+    clip-path: polygon(12% 0%, 100% 0%, 88% 100%, 0% 100%);
+}
+
+.confirm, .invite-btn { background: var(--accent); color: #000; box-shadow: 0 0 25px var(--accent-glow); }
+.confirm:hover { background: white; transform: translateY(-3px); box-shadow: 0 0 45px var(--accent-glow); }
+
+.leave-btn { background: transparent; color: var(--danger); border: 1px solid var(--danger); clip-path: none; border-radius: 4px; font-size: 0.9vw; }
+.leave-btn:hover { background: var(--danger); color: white; box-shadow: 0 0 25px var(--danger-glow); }
+
+/* =====================================================
+   [13] SYSTEM POPUPS
+   ===================================================== */
+.popUp {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: var(--bg-void); border: 2px solid var(--accent); padding: 60px;
+    width: 600px; text-align: center; z-index: 5000;
+    box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 60px rgba(0, 210, 255, 0.05);
+}
+
+.popUpText { font-family: var(--font-header); font-size: 2vw; font-weight: 900; color: white; margin-bottom: 40px; letter-spacing: 3px; }
+
+#cancel { 
+    background: rgba(255, 255, 255, 0.05); color: white; padding: 20px; flex: 1; 
+    cursor: pointer; border: 1px solid var(--glass-border); font-family: var(--font-header);
+    font-size: 1.1vw; letter-spacing: 3px; transition: 0.2s;
+}
+#cancel:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* =====================================================
+   [14] VFX & FINAL POLISH
+   ===================================================== */
+.main::after {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 210, 255, 0.02) 2px);
+  pointer-events: none; opacity: 0.6; z-index: 200;
+}
+
+/* Moving Scanline Line Effect */
+.holographic-line {
+    position: absolute; width: 100%; height: 2px; background: rgba(0, 210, 255, 0.3);
+    box-shadow: 0 0 15px var(--accent); top: 0; left: 0;
+    animation: holographicScan 10s infinite linear;
+    pointer-events: none; z-index: 201;
+}
+
+/* End of Tactical Stylesheet */
