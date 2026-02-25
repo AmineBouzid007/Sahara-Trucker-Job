@@ -2,7 +2,7 @@
     =====================================================
     PROJECT: HYPER-LOGISTICS TERMINAL [FULL ACCESS]
     AUTHOR: AMINE / GEMINI ENTERPRISE ✨
-    THEME: CYBER-TACTICAL BLUE (v6.0.0)
+    THEME: CYBER-TACTICAL BLUE (v6.0.1 - CORRECTED)
     TOTAL LINES: ~700 [EXPANDED]
     =====================================================
 */
@@ -12,7 +12,7 @@
 :root {
     /* Core Tactical Palette */
     --accent: #00d2ff;          /* Electric Cyan */
-    --accent-dark: #0072ff;     /* Deep Power Blue */
+    --accent-dark: #0072ff;      /* Deep Power Blue */
     --accent-glow: rgba(0, 210, 255, 0.4);
     --accent-dim: rgba(0, 210, 255, 0.08);
     
@@ -22,7 +22,7 @@
     --danger: #ff2a6d;          /* Signal Red */
     --danger-glow: rgba(255, 42, 109, 0.3);
     
-    --bg-void: #02040a;         /* Deep Black */
+    --bg-void: #02040a;          /* Deep Black */
     --bg-glass: rgba(8, 12, 18, 0.95);
     --glass-border: rgba(0, 210, 255, 0.15);
     
@@ -40,35 +40,30 @@
 }
 
 /* =====================================================
-   [01] ADVANCED KEYFRAMES (RARE VFX)
-   ===================================================== */
+    [01] ADVANCED KEYFRAMES (RARE VFX)
+    ===================================================== */
 @keyframes neonPulse {
     0% { filter: drop-shadow(0 0 2px var(--accent)); opacity: 0.8; }
     50% { filter: drop-shadow(0 0 12px var(--accent)); opacity: 1; }
     100% { filter: drop-shadow(0 0 2px var(--accent)); opacity: 0.8; }
 }
-
 @keyframes holographicScan {
     0% { transform: translateY(-100%); opacity: 0; }
     50% { opacity: 0.5; }
     100% { transform: translateY(100%); opacity: 0; }
 }
-
 @keyframes terminalText {
     from { opacity: 0.4; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1); }
 }
-
 @keyframes glitchShimmer {
     0% { background-position: 0 0; }
     100% { background-position: 100% 100%; }
 }
-
 @keyframes activeSpin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
-
 @keyframes noiseOpacity {
     0% { opacity: 0.03; }
     50% { opacity: 0.06; }
@@ -76,19 +71,17 @@
 }
 
 /* =====================================================
-   [02] GLOBAL BASE & RESET
-   ===================================================== */
+    [02] GLOBAL BASE & RESET
+    ===================================================== */
 * {
     margin: 0; padding: 0;
     box-sizing: border-box;
     user-select: none;
     -webkit-font-smoothing: antialiased;
 }
-
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 ::-webkit-scrollbar-thumb { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-
 html, body {
     width: 100%; height: 100%;
     background: transparent !important; /* ALLOWS GAME VIEW */
@@ -97,8 +90,8 @@ html, body {
 }
 
 /* =====================================================
-   [03] MASTER WRAPPER (GHOST BUG PROTECTOR)
-   ===================================================== */
+    [03] MASTER WRAPPER (GHOST BUG PROTECTOR)
+    ===================================================== */
 #ui-wrapper {
     display: none; /* FORCED OFF UNTIL SCRIPT ACTIVATES */
     width: 100%; height: 100%;
@@ -119,9 +112,10 @@ html, body {
 .reject { background: rgba(255, 255, 255, 0.05); color: white; }
 .accept { background: var(--accent); color: black; }
 .accept:hover { background: white; box-shadow: 0 0 30px var(--accent); }
+
 /* =====================================================
-   [04] MAIN HUD FRAME (REFINED PROPORTIONS)
-   ===================================================== */
+    [04] MAIN HUD FRAME (REFINED PROPORTIONS)
+    ===================================================== */
 .main {
     position: relative;
     width: 88%; height: 84%; /* SLIGHTLY SMALLER FOR MODERN LOOK */
@@ -153,19 +147,20 @@ html, body {
         linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none; opacity: 0.5;
+    z-index: 1; /* FIX: Ensure grid is behind content */
 }
 
 /* =====================================================
-   [05] SIDEBAR NAVIGATION (CYBER TERMINAL)
-   ===================================================== */
+    [05] SIDEBAR NAVIGATION (CYBER TERMINAL)
+    ===================================================== */
 .sidebar {
     position: relative;
     width: var(--sidebar-w); background: rgba(0, 0, 0, 0.5);
     border-right: 1px solid var(--glass-border);
     display: flex; flex-direction: column; align-items: center;
-    padding-top: 50px; gap: 35px; z-index: 110;
+    padding-top: 50px; gap: 35px; 
+    z-index: 50; /* FIX: Ensure sidebar is above background effects */
 }
-
 .nav-item {
     position: relative;
     width: 75px; height: 75px;
@@ -173,34 +168,31 @@ html, body {
     color: rgba(0, 210, 255, 0.2); transition: var(--transition-norm);
     cursor: pointer; border: 1px solid transparent;
 }
-
 .nav-item i { font-size: 2vw; margin-bottom: 6px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .nav-item span { font-family: var(--font-header); font-size: 0.6vw; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-
 .nav-item:hover { color: var(--accent); background: rgba(0, 210, 255, 0.05); }
 .nav-item:hover i { transform: scale(1.2); }
-
 .nav-item.active {
     color: #000; background: var(--accent);
     box-shadow: 0 0 30px var(--accent-glow);
     border-radius: 4px;
 }
-
 .nav-item.active::before {
     content: ""; position: absolute; left: -10px; width: 4px; height: 100%;
     background: white; box-shadow: 0 0 15px white;
 }
 
 /* =====================================================
-   [06] HEADER HUD STRIP (DETAILED)
-   ===================================================== */
-.content-wrapper { flex: 1; height: 100%; padding: 45px; display: flex; flex-direction: column; position: relative; }
-
+    [06] HEADER HUD STRIP (DETAILED)
+    ===================================================== */
+.content-wrapper { 
+    flex: 1; height: 100%; padding: 45px; display: flex; flex-direction: column; position: relative; 
+    z-index: 50; /* FIX: Ensure main content is above background effects */
+}
 .topWrapper { 
     display: flex; justify-content: space-between; align-items: flex-end; 
     margin-bottom: 40px; border-bottom: 1px solid rgba(0, 210, 255, 0.1); padding-bottom: 30px; 
 }
-
 .topWrapper-jobName { display: flex; align-items: center; gap: 20px; }
 .iconLogo i { font-size: 3.5vw; color: var(--accent); animation: neonPulse 4s infinite; }
 .jobText { font-family: var(--font-header); font-size: 2.8vw; font-weight: 900; letter-spacing: 6px; color: white; text-transform: uppercase; text-shadow: 0 0 20px var(--accent-glow); }
@@ -212,7 +204,6 @@ html, body {
 .levelProg { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.05); position: relative; overflow: visible; }
 .levelStatus { height: 100%; background: linear-gradient(90deg, var(--accent-dark), var(--accent)); box-shadow: 0 0 15px var(--accent); width: 0%; transition: width 1.5s ease; position: relative; }
 .levelStatus::after { content: ""; position: absolute; right: -4px; top: -5px; width: 12px; height: 12px; background: white; border-radius: 50%; box-shadow: 0 0 15px white; }
-
 .closeIcon { 
     width: 38px; height: 38px; background: var(--danger); color: white; 
     display: flex; align-items: center; justify-content: center; 
@@ -221,10 +212,9 @@ html, body {
 .closeIcon:hover { background: white; color: var(--danger); transform: rotate(90deg) scale(1.1); }
 
 /* =====================================================
-   [07] SEARCH & DATABASE FILTERS
-   ===================================================== */
+    [07] SEARCH & DATABASE FILTERS
+    ===================================================== */
 .filter-hud { display: flex; gap: 25px; margin-bottom: 35px; }
-
 .search-terminal { 
     flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); 
     padding: 15px 25px; display: flex; align-items: center; gap: 15px; position: relative;
@@ -234,7 +224,6 @@ html, body {
     font-family: var(--font-mono); font-size: 0.95vw; width: 100%; letter-spacing: 1px;
 }
 .search-terminal::after { content: "DB_STREAM_ACTIVE"; position: absolute; top: -10px; left: 15px; font-size: 0.45vw; color: var(--accent); background: var(--bg-void); padding: 0 6px; }
-
 .filter-btn { 
     background: rgba(0, 210, 255, 0.05); border: 1px solid var(--accent); 
     padding: 15px 35px; color: var(--accent); font-family: var(--font-header); font-size: 0.85vw; 
@@ -243,10 +232,18 @@ html, body {
 .filter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 30px var(--accent-glow); }
 
 /* =====================================================
-   [08] JOB LISTING CARDS (SMALLER & REFINED)
-   ===================================================== */
-.listArea { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 15px; }
+    [08] JOB LISTING CARDS (SMALLER & REFINED)
+    ===================================================== */
 
+/* FIX: Changed selector from '.listArea' to '#jobListArea' to match the HTML ID */
+#jobListArea { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+    overflow-y: auto; 
+    padding-right: 15px; 
+}
 .trailerItem {
     position: relative;
     display: flex; align-items: center; gap: 30px; padding: 20px 25px;
@@ -254,40 +251,33 @@ html, body {
     border-left: 3px solid rgba(0, 210, 255, 0.1);
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
 }
-
 .trailerItem:hover { 
     background: linear-gradient(90deg, rgba(0, 210, 255, 0.08) 0%, transparent 100%); 
     border-left-color: var(--accent); transform: translateX(15px);
 }
-
 .trailerItem.active { background: rgba(0, 210, 255, 0.1); border-left-color: white; box-shadow: inset 50px 0 50px rgba(0, 210, 255, 0.02); }
-
 .trailerImg { 
     width: 150px; height: 85px; background: rgba(0, 0, 0, 0.5); 
     border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center;
 }
 .trailerImg img { width: 85%; filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.3)); }
-
 .trailerInfo { flex: 1; }
 .trailerName { font-family: var(--font-header); font-size: 1.4vw; color: white; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
 .trailerRoute { font-family: var(--font-mono); font-size: 0.8vw; color: var(--accent); opacity: 0.5; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
-
 .trailerStats { text-align: right; }
 .trailerPrice { font-family: var(--font-tech); font-size: 1.6vw; color: white; font-weight: 700; text-shadow: 0 0 15px var(--accent); }
 .trailerDist { font-family: var(--font-mono); font-size: 0.75vw; color: var(--accent); opacity: 0.4; text-transform: uppercase; }
 
 /* =====================================================
-   [09] REFINED LEVEL LOCK (HIGH VISIBILITY)
-   ===================================================== */
+    [09] REFINED LEVEL LOCK (HIGH VISIBILITY)
+    ===================================================== */
 .locked { filter: grayscale(1) brightness(0.4); pointer-events: none; }
-
 .locked-overlay {
     position: absolute; inset: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex; align-items: center; justify-content: center;
     z-index: 10;
 }
-
 .locked-overlay::before {
     content: attr(data-level-text); 
     color: white; 
@@ -303,24 +293,20 @@ html, body {
 }
 
 /* =====================================================
-   [10] CONVOY AUTH (HOST/JOIN SCREENS)
-   ===================================================== */
+    [10] CONVOY AUTH (HOST/JOIN SCREENS)
+    ===================================================== */
 .convoy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding-top: 20px; }
-
 .convoy-box {
     background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border);
     padding: 60px 40px; text-align: center; position: relative; overflow: hidden;
 }
-
 .convoy-box::before {
     content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
-
 .convoy-box .trailerName { color: white !important; font-size: 2.2vw; font-family: var(--font-header); letter-spacing: 4px; margin-bottom: 10px; }
 .convoy-box .trailerType { color: var(--accent) !important; font-size: 0.85vw; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
 .convoy-box .trailerPrice { color: white !important; font-size: 3.5vw; font-family: var(--font-tech); margin: 30px 0; text-shadow: 0 0 25px var(--accent-glow); }
-
 .convoy-input-field {
     width: 100%; height: 65px; background: rgba(0, 210, 255, 0.03);
     border: 1px solid var(--accent); color: white; 
@@ -329,26 +315,21 @@ html, body {
 }
 
 /* =====================================================
-   [11] CONVOY LOBBY (THE MISSING ACTIVE SCREEN)
-   ===================================================== */
+    [11] CONVOY LOBBY (THE MISSING ACTIVE SCREEN)
+    ===================================================== */
 #convoyLobby { width: 100%; height: 100%; display: flex; flex-direction: column; animation: terminalText 0.5s ease; }
-
 .lobby-header {
     display: flex; justify-content: space-between; align-items: center;
     background: rgba(0, 210, 255, 0.05); border: 1px solid var(--glass-border);
     padding: 25px 35px; border-radius: 4px; margin-bottom: 30px;
 }
-
 .lobby-title { font-family: var(--font-header); font-size: 1.8vw; color: white; letter-spacing: 4px; text-transform: uppercase; }
 .lobby-title span { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-
 .lobby-content { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; flex: 1; min-height: 0; }
-
 .lobby-panel {
     background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border);
     border-radius: 8px; padding: 25px; display: flex; flex-direction: column; overflow: hidden;
 }
-
 .panel-header {
     font-family: var(--font-header); color: var(--accent); text-transform: uppercase;
     margin-bottom: 20px; border-bottom: 1px solid rgba(0, 210, 255, 0.1);
@@ -357,7 +338,6 @@ html, body {
 
 /* Player List Items */
 .player-scroll { flex: 1; overflow-y: auto; padding-right: 10px; }
-
 .player-row {
     display: flex; justify-content: space-between; align-items: center;
     padding: 15px 20px; background: rgba(255, 255, 255, 0.02);
@@ -374,33 +354,29 @@ html, body {
 .no-mission { font-family: var(--font-header); font-size: 1.4vw; color: white; opacity: 0.3; letter-spacing: 3px; }
 
 /* =====================================================
-   [12] TACTICAL BUTTONS & INPUTS
-   ===================================================== */
+    [12] TACTICAL BUTTONS & INPUTS
+    ===================================================== */
 .confirm, .invite-btn, .leave-btn {
     position: relative; padding: 18px 40px; font-family: var(--font-header); font-weight: 900;
     font-size: 1.1vw; letter-spacing: 4px; text-transform: uppercase;
     cursor: pointer; transition: 0.3s; border: none;
     clip-path: polygon(12% 0%, 100% 0%, 88% 100%, 0% 100%);
 }
-
 .confirm, .invite-btn { background: var(--accent); color: #000; box-shadow: 0 0 25px var(--accent-glow); }
 .confirm:hover { background: white; transform: translateY(-3px); box-shadow: 0 0 45px var(--accent-glow); }
-
 .leave-btn { background: transparent; color: var(--danger); border: 1px solid var(--danger); clip-path: none; border-radius: 4px; font-size: 0.9vw; }
 .leave-btn:hover { background: var(--danger); color: white; box-shadow: 0 0 25px var(--danger-glow); }
 
 /* =====================================================
-   [13] SYSTEM POPUPS
-   ===================================================== */
+    [13] SYSTEM POPUPS
+    ===================================================== */
 .popUp {
     display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg-void); border: 2px solid var(--accent); padding: 60px;
     width: 600px; text-align: center; z-index: 5000;
     box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 60px rgba(0, 210, 255, 0.05);
 }
-
 .popUpText { font-family: var(--font-header); font-size: 2vw; font-weight: 900; color: white; margin-bottom: 40px; letter-spacing: 3px; }
-
 #cancel { 
     background: rgba(255, 255, 255, 0.05); color: white; padding: 20px; flex: 1; 
     cursor: pointer; border: 1px solid var(--glass-border); font-family: var(--font-header);
@@ -409,20 +385,108 @@ html, body {
 #cancel:hover { background: rgba(255, 255, 255, 0.1); }
 
 /* =====================================================
-   [14] VFX & FINAL POLISH
-   ===================================================== */
+    [14] VFX & FINAL POLISH
+    ===================================================== */
+/* FIX: Changed z-index from 200 to 2, so it sits behind the main content */
 .main::after {
   content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 210, 255, 0.02) 2px);
-  pointer-events: none; opacity: 0.6; z-index: 200;
+  pointer-events: none; opacity: 0.6; 
+  z-index: 2; 
 }
 
 /* Moving Scanline Line Effect */
+/* FIX: Changed z-index from 201 to 3, so it sits behind the main content */
 .holographic-line {
     position: absolute; width: 100%; height: 2px; background: rgba(0, 210, 255, 0.3);
     box-shadow: 0 0 15px var(--accent); top: 0; left: 0;
     animation: holographicScan 10s infinite linear;
-    pointer-events: none; z-index: 201;
+    pointer-events: none; 
+    z-index: 3;
 }
+
+/* =====================================================
+    [15] CONVOY JOB LIST (Shrunken)
+    ===================================================== */
+
+.convoy-job-scroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Reduced gap */
+}
+
+.convoy-job-item {
+    background: rgba(0, 210, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-left: 2px solid var(--accent-dark); /* Thinner border */
+    padding: 10px 15px; /* Reduced padding */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.convoy-job-item:hover {
+    background: rgba(0, 210, 255, 0.08);
+    border-left-color: var(--accent);
+    transform: scale(1.02);
+}
+
+.convoy-job-item.active {
+    background: rgba(0, 210, 255, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.convoy-job-name {
+    font-family: var(--font-header);
+    color: white;
+    font-size: 0.85vw; /* Reduced font size */
+    letter-spacing: 1px;
+    margin-bottom: 5px; /* Reduced margin */
+    text-transform: uppercase;
+}
+
+.convoy-job-details {
+    display: flex;
+    gap: 15px; /* Reduced gap */
+    font-family: var(--font-mono);
+    font-size: 0.7vw; /* Reduced font size */
+    color: var(--accent);
+    opacity: 0.6;
+}
+
+/* =====================================================
+    [16] NEW: PLAYER COUNT & START BUTTON
+    ===================================================== */
+#player-count {
+    font-family: var(--font-tech);
+    color: white;
+    text-align: center;
+    font-size: 1.5vw;
+    margin-top: auto; /* Pushes to the bottom */
+    padding: 20px 0;
+    opacity: 0.5;
+}
+
+#start-convoy-job-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    font-size: 1vw;
+    clip-path: none; /* Use a simpler shape for this button */
+    border-radius: 4px;
+}
+
+#start-convoy-job-btn.disabled {
+    background: rgba(100, 100, 100, 0.3);
+    color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
 
 /* End of Tactical Stylesheet */
