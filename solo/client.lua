@@ -47,8 +47,10 @@ end
 -- ==========================================
 -- [03] NPC & TARGET INITIALIZATION
 -- ==========================================
+-- In solo/client.lua -- REPLACE THE NPC CREATION THREAD WITH THIS
+
 CreateThread(function()
-    -- Uses SoloConfig from solo/config.lua
+    -- This is now the ONLY script that creates the NPC.
     if not SoloConfig or not SoloConfig.NPC then return end
     if not LoadModel(SoloConfig.NPC.model) then return end
     
@@ -59,38 +61,35 @@ CreateThread(function()
     FreezeEntityPosition(ped, true)
     SetBlockingOfNonTemporaryEvents(ped, true)
     
-    -- Load Tactical Animation
     if SoloConfig.NPC.animation then
         lib.requestAnimDict(SoloConfig.NPC.animation[1])
         TaskPlayAnim(ped, SoloConfig.NPC.animation[1], SoloConfig.NPC.animation[2], 8.0, 0, -1, 49, 0, 0, 0, 0)
     end
 
-    -- Personal Logistics Blip
-    local cfgBlip = SoloConfig.NPC.blip
     local npcBlip = AddBlipForEntity(ped)
-    SetBlipSprite(npcBlip, cfgBlip.sprite or 477)
-    SetBlipColour(npcBlip, cfgBlip.color or 3)
-    SetBlipScale(npcBlip, cfgBlip.scale or 0.8)
+    SetBlipSprite(npcBlip, 477)
+    SetBlipColour(npcBlip, 4) -- Yellow for multi-purpose
+    SetBlipScale(npcBlip, 0.9)
     SetBlipAsShortRange(npcBlip, true)
     BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString(cfgBlip.name or "Solo Trucking")
+    AddTextComponentString("Logistics Terminal")
     EndTextCommandSetBlipName(npcBlip)
-
-    -- ox_target Integration (Cyber Interaction)
+    
+    -- A SINGLE target option that gets ALL data at once.
     exports.ox_target:addLocalEntity(ped, {
         {
-            name = 'solo_truck_npc',
-            icon = 'fa-solid fa-user-gear',
-            label = 'Access Personal Terminal',
+            name = 'unified_logistics_terminal',
+            icon = 'fa-solid fa-globe',
+            label = 'Access Logistics Network',
             distance = 2.5,
             onSelect = function()
                 if jobActive then
-                    lib.notify({ title='TERMINAL', description='Active contract in progress. Finish deployment first.', type='error' })
+                    lib.notify({ title='TERMINAL', description='Active contract in progress.', type='error' })
                     return
                 end
                 
-                -- Callback targeting the solo/server.lua
-                ESX.TriggerServerCallback('truckjob:solo:getData', function(data)
+                -- Call the new unified server callback
+                ESX.TriggerServerCallback('truckjob:getInitialData', function(data)
                     if data then
                         playerLevel = data.player.level 
                         SetNuiFocus(true, true)
@@ -98,8 +97,8 @@ CreateThread(function()
                             action = "openUI",
                             serverID = GetPlayerServerId(PlayerId()),
                             player = data.player,
-                            jobs = data.jobs,        -- Normal Jobs
-                            randomJobs = data.randomJobs -- Solo Random Jobs
+                            soloJobs = data.soloJobs,
+                            convoyJobs = data.convoyJobs
                         })
                     else
                         lib.notify({ title='SYSTEM ERROR', description='Uplink to logistics database failed.', type='error' })
@@ -109,6 +108,8 @@ CreateThread(function()
         }
     })
 end)
+
+
 
 -- ==========================================
 -- [04] NUI CALLBACKS (SOLO LOGIC)
@@ -120,10 +121,17 @@ RegisterNUICallback('closeUI', function(_, cb)
 end)
 
 -- This handles job start for SOLO contracts
-RegisterNUICallback('startJob', function(data, cb)
+RegisterNUICallback('startSoloJob', function(data, cb)
+
     SetNuiFocus(false, false)
-    -- We ignore convoyID here because this is the solo script
+
+    if not data.jobType then
+        cb('ok')
+        return
+    end
+
     StartSoloTruckJob(data.jobType)
+
     cb('ok')
 end)
 
