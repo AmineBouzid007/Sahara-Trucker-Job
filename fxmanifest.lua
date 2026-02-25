@@ -18,10 +18,10 @@ shared_scripts {
     '@ox_lib/init.lua',
     -- Solo Module Shared
     'solo/config.lua',
-    'solo/location.lua',
+    'solo/locations.lua',
     -- Convoy Module Shared
     'convoy/config.lua',
-    'convoy/location.lua'
+    'convoy/locations.lua'
 }
 
 -- Client Logic
