@@ -1,172 +1,397 @@
+// ==========================================
+// [01] GLOBAL STATE
+// ==========================================
+let soloJobList = [];
+let convoyJobList = [];
+let myServerID = null;
+let currentConvoyID = null;
+let isLeader = false;
+let memberCount = 0;
+let playerLevel = 1;
+let currentJobId = null;
 
-local ESX = exports['es_extended']:getSharedObject()
+// ==========================================
+// [02] INITIALIZATION
+// ==========================================
+$(document).ready(function () {
 
--- =====================================================
--- [01] DATA STORAGE & EXPORT
--- =====================================================
-local ActiveConvoys = {} 
-local ConvoyJobPool = {} 
+    $('#ui-wrapper, .popUp, .page-container').hide();
+    $('#jobsPage').show();
 
-exports('getConvoyJobs', function()
-    return ConvoyJobPool
-end)
+    if ($('#player-count').length === 0) {
+        const lobbyPanel = $('.lobby-panel').first();
+        lobbyPanel.append('<div id="player-count">0/4</div>');
+        lobbyPanel.append('<div id="start-convoy-job-btn" class="confirm disabled">Start Job</div>');
+    }
 
--- =====================================================
--- [02] GENERATORS & SETUP
--- =====================================================
-local function GenerateUniqueID()
-    local newID
-    while true do
-        newID = math.random(1111, 9999) 
-        if not ActiveConvoys[newID] then return newID end
-    end
-end
+    // NAVIGATION
+    $('.nav-item').on('click', function () {
 
-local function GenerateConvoyContracts()
-    if not ConvoyConfig or not ConvoyConfig.JobPool then return false end
-    ConvoyJobPool = {}
-    math.randomseed(os.time())
-    local poolSize = #ConvoyConfig.JobPool
-    if poolSize == 0 then return false end
-    for i = 1, (ConvoyConfig.MaxDailyJobs or 5) do
-        local base = ConvoyConfig.JobPool[math.random(1, poolSize)]
-        if base then
-            table.insert(ConvoyJobPool, {
-                id = 2000 + i, name = "SQUAD_OP: " .. (base.name or "Cargo"), type = base.type, streetNames = "HIGH_SECURITY_SECTOR", totalPrice = (base.basePrice or 600) + math.random(200, 500), level = base.minLevel or 1, distance = math.random(10, 25), imgSrc = base.img, trailerModel = base.trailerModel
-            })
-        end
-    end
-    print("^4[Convoy System]^7 Uplink established. " .. #ConvoyJobPool .. " squad contracts ready.")
-    return true
-end
-CreateThread(function()
-    while not GenerateConvoyContracts() do
-        Wait(2000)
-    end
-end)
+        const targetPage = $(this).data('page');
 
--- =====================================================
--- [03] SESSION MANAGEMENT
--- =====================================================
-RegisterNetEvent('truckjob:server:createConvoy', function()
-    local src = source
-    local uniqueID = GenerateUniqueID()
-    ActiveConvoys[uniqueID] = { leader = src, members = { {name = GetPlayerName(src) .. " (Leader)", id = src, isLeader = true} }, currentJob = nil }
-    TriggerClientEvent('truckjob:client:updateConvoyPlayers', src, ActiveConvoys[uniqueID].members, uniqueID)
-end)
+        $('.nav-item').removeClass('active');
+        $(this).addClass('active');
 
-RegisterNetEvent('truckjob:server:joinConvoy', function(convoyID)
-    local src = source
-    local cID = tonumber(convoyID)
-    if ActiveConvoys[cID] then
-        table.insert(ActiveConvoys[cID].members, {name = GetPlayerName(src), id = src, isLeader = false})
-        for _, m in ipairs(ActiveConvoys[cID].members) do TriggerClientEvent('truckjob:client:updateConvoyPlayers', m.id, ActiveConvoys[cID].members, cID) end
-        if ActiveConvoys[cID].currentJob then TriggerClientEvent('truckjob:client:syncConvoyJob', src, ActiveConvoys[cID].currentJob) end
-    else
-        TriggerClientEvent('truckjob:client:joinFailed', src)
-    end
-end)
+        $('.page-container').hide();
+        $('#' + targetPage).fadeIn(200);
 
-RegisterNetEvent('truckjob:server:selectJob', function(data)
-    local src = source
-    local cID = tonumber(data.convoyID)
-    if cID and ActiveConvoys[cID] and ActiveConvoys[cID].leader == src then
-        ActiveConvoys[cID].currentJob = data.jobData
-        for _, member in ipairs(ActiveConvoys[cID].members) do
-            if member.id ~= src then TriggerClientEvent('truckjob:client:syncConvoyJob', member.id, data.jobData) end
-        end
-    end
-end)
+        if (targetPage === 'jobsPage') loadSoloJobs();
+        if (targetPage === 'convoyPage') loadConvoyJobs();
+    });
 
--- =====================================================
--- [04] SQUAD DEPLOYMENT (WITH ON-SCREEN NOTIFICATIONS)
--- =====================================================
-RegisterNetEvent('truckjob:server:requestConvoyStart', function()
-    local src = source
-    local convoyData = nil
-    for id, data in pairs(ActiveConvoys) do
-        if data.leader == src then convoyData = data; break end
-    end
+    $('#closeBtn, .closeIcon').on('click', closeMenu);
+    $('#cancel').on('click', () => $('.popUp').fadeOut(200));
 
-    if not convoyData then
-        TriggerClientEvent('ox_lib:notify', src, { id = 'truck_err', title='SERVER FAIL', description = 'You are not a convoy leader.', type = 'error' })
-        return
-    end
+    // ==========================================
+    // SOLO JOB START
+    // ==========================================
+    $('#confirm').on('click', function () {
 
-    if not convoyData.currentJob then
-        TriggerClientEvent('ox_lib:notify', src, { id = 'truck_err', title='SERVER FAIL', description = 'No contract has been selected.', type = 'error' })
-        return
-    end
+        if (!currentJobId) return;
 
-    if #convoyData.members < 1 then
-        TriggerClientEvent('ox_lib:notify', src, { 
-            id = 'truck_err', 
-            title='SERVER FAIL', 
-            description = 'Not enough members (need at least 1 for test).', 
-            type = 'error' 
-        })
-        return
-    end
-    
-    local jobData = convoyData.currentJob
-    local jobType = jobData.type
-    local truckModel = ConvoyConfig.TruckModels and ConvoyConfig.TruckModels[jobType] or 'phantom'
-    local trailerModel = jobData.trailerModel or 'tanker'
+        const selectedJob = soloJobList.find(j => j.id === currentJobId);
+        if (!selectedJob) return;
 
-    if not jobType or not truckModel or not trailerModel then
-        TriggerClientEvent('ox_lib:notify', src, { id = 'truck_err', title='SERVER FAIL', description = "Job data is incomplete (missing type, truck, or trailer model).", type = 'error' })
-        return
-    end
+        $.post(`https://${GetParentResourceName()}/startSoloJob`, JSON.stringify({
+            jobId: selectedJob.id,
+            jobType: selectedJob.type
+        }));
 
-    local deliveryPoints = ConvoyLocations.DeliveryPoints[jobType]
-    if not deliveryPoints or #deliveryPoints == 0 then
-        TriggerClientEvent('ox_lib:notify', src, { id = 'truck_err', title='SERVER FAIL', description = "No delivery points found for job type: " .. jobType, type = 'error' })
-        return
-    end
-    
-    TriggerClientEvent('ox_lib:notify', src, { id = 'truck_ok', title='SERVER PASS', description = 'All checks passed. Spawning vehicles...', type = 'success' })
-    Wait(1000)
-    
-    local sharedDestIndex = math.random(#deliveryPoints)
+        $('.popUp').fadeOut(200);
+        closeMenu();
+    });
 
-    print("[CONVOY] Starting mission for", #convoyData.members, "players")
-    for i, member in ipairs(convoyData.members) do
-        local truckSpawn = vector4(ConvoyConfig.TruckSpawn.x + ((i - 1) * 8.0), ConvoyConfig.TruckSpawn.y, ConvoyConfig.TruckSpawn.z, ConvoyConfig.TruckSpawn.w)
-        local trailerSpawn = ConvoyConfig.TrailerSpawnPoints[i] or ConvoyConfig.TrailerSpawnPoints[#ConvoyConfig.TrailerSpawnPoints]
+    // FILTER
+    $('.filterMenu').on('click', () => $('.menu-items').fadeToggle(150));
 
-        local truck = CreateVehicle(joaat(truckModel), truckSpawn.x, truckSpawn.y, truckSpawn.z, truckSpawn.w, true, true)
-        local trailer = CreateVehicle(joaat(trailerModel), trailerSpawn.x, trailerSpawn.y, trailerSpawn.z, trailerSpawn.w, true, true)
-        
-        local timeout = 0
-        while not DoesEntityExist(truck) or not DoesEntityExist(trailer) do Wait(50); timeout = timeout + 50; if timeout > 2000 then break end end
+    $('#asc').on('click', () => { soloJobList.sort((a,b)=>a.totalPrice-b.totalPrice); loadSoloJobs(); });
+    $('#desc').on('click', () => { soloJobList.sort((a,b)=>b.totalPrice-a.totalPrice); loadSoloJobs(); });
+    $('#farthest').on('click', () => { soloJobList.sort((a,b)=>b.distance-a.distance); loadSoloJobs(); });
+    $('#shortest').on('click', () => { soloJobList.sort((a,b)=>a.distance-b.distance); loadSoloJobs(); });
 
-        if DoesEntityExist(truck) and DoesEntityExist(trailer) then
-            SetVehicleNumberPlateText(truck, "SQD-" .. member.id)
-            TriggerClientEvent('truckjob:convoy:client:beginMission', member.id, NetworkGetNetworkIdFromEntity(truck), NetworkGetNetworkIdFromEntity(trailer), jobType, sharedDestIndex)
-        else
-            TriggerClientEvent('ox_lib:notify', member.id, { id = 'truck_err', title='CRITICAL FAIL', description = "Could not create vehicles.", type = 'error' })
-        end
-    end
-end)
+    $('#trailerInput').on('keyup', function () {
 
--- =====================================================
--- [05] CLEANUP HANDLER
--- =====================================================
-local function HandleDeparture(src)
-    for id, data in pairs(ActiveConvoys) do
-        for i, m in ipairs(data.members) do
-            if m.id == src then
-                if data.leader == src then
-                    for _, member in ipairs(data.members) do TriggerClientEvent('truckjob:client:joinFailed', member.id) end
-                    ActiveConvoys[id] = nil
-                else
-                    table.remove(data.members, i)
-                    for _, member in ipairs(data.members) do TriggerClientEvent('truckjob:client:updateConvoyPlayers', member.id, data.members, id) end
-                end
-                return
-            end
-        end
-    end
-end
-RegisterNetEvent('truckjob:server:leaveConvoy', function() HandleDeparture(source) end)
-AddEventHandler('playerDropped', function() HandleDeparture(source) end)
+        const val = $(this).val().toLowerCase();
+
+        $("#jobListArea .trailerItem").each(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(val) > -1);
+        });
+
+    });
+
+    // ==========================================
+    // CONVOY START
+    // ==========================================
+$('#start-convoy-job-btn').on('click', function () {
+    if ($(this).hasClass('disabled')) {
+        $.post(`https://${GetParentResourceName()}/notify`, JSON.stringify({
+            type: 'error',
+            message: 'Select a contract and have at least 1 member.'
+        }));
+        return;
+    }
+
+    // Send the convoy ID to the server
+    $.post(`https://${GetParentResourceName()}/requestConvoyStart`, JSON.stringify({
+        convoyID: currentConvoyID
+    }));
+});
+});
+
+// ==========================================
+// [03] NUI MESSAGE HANDLER
+// ==========================================
+window.addEventListener('message', function (event) {
+
+    const data = event.data;
+
+    switch (data.action) {
+
+        case "openUI":
+
+            myServerID = data.serverID;
+
+            soloJobList = (data.soloJobs?.static || []).concat(data.soloJobs?.random || []);
+            convoyJobList = data.convoyJobs || [];
+
+            if (data.player) {
+                $('#playerName').text("USER_REF: " + data.player.name);
+                updateLevelUI(data.player.xp, data.player.level);
+            }
+
+            $('.nav-item[data-page="jobsPage"]').click();
+
+            $('#ui-wrapper').css('display', 'flex').hide().fadeIn(300);
+
+        break;
+
+        case "updateConvoyPlayers":
+
+            currentConvoyID = data.convoyID || currentConvoyID;
+
+            const members = data.members || [];
+            memberCount = members.length;
+
+            const me = members.find(m => m.id === myServerID);
+            isLeader = me && me.isLeader === true;
+
+            if (currentConvoyID) {
+
+                $('#convoyAuth').hide();
+                $('#convoyLobby').show();
+
+                $('#activeConvoyID').text("#" + currentConvoyID);
+
+                renderLobbyPlayers(members);
+
+                $('#player-count').text(memberCount + '/4');
+            }
+
+            loadConvoyJobs();
+            updateStartButtonState();
+
+        break;
+
+        case "syncConvoyJob":
+
+            if (data.jobData && !isLeader) {
+                currentJobId = data.jobData.id;
+                loadConvoyJobs();
+            }
+
+        break;
+
+        case "resetConvoy":
+
+            resetConvoyUI();
+
+        break;
+
+        case "close":
+
+            closeMenu();
+
+        break;
+    }
+
+});
+
+// ==========================================
+// [04] CONVOY SYSTEM
+// ==========================================
+function updateStartButtonState() {
+
+    const startButton = $('#start-convoy-job-btn');
+
+    if (isLeader && memberCount >= 1 && currentJobId !== null) {
+        startButton.removeClass('disabled');
+    } else {
+        startButton.addClass('disabled');
+    }
+
+}
+
+$('#createConvoyBtn').on('click', () => {
+    $.post(`https://${GetParentResourceName()}/createConvoy`, JSON.stringify({}));
+});
+
+$('#joinConvoyBtn').on('click', () => {
+
+    const id = $('#joinIDInput').val();
+
+    if (!id) return;
+
+    $.post(`https://${GetParentResourceName()}/joinConvoy`, JSON.stringify({
+        convoyID: id
+    }));
+
+});
+
+$('#leaveConvoyBtn').on('click', () => {
+
+    $.post(`https://${GetParentResourceName()}/leaveConvoy`, JSON.stringify({}));
+    resetConvoyUI();
+
+});
+
+function resetConvoyUI() {
+
+    currentConvoyID = null;
+    isLeader = false;
+    currentJobId = null;
+    memberCount = 0;
+
+    $('#convoyLobby').hide();
+    $('#convoyAuth').show();
+
+    $('#player-count').text('0/4');
+
+    updateStartButtonState();
+    loadConvoyJobs();
+
+}
+
+function renderLobbyPlayers(players) {
+
+    const container = $('#playerList');
+    container.empty();
+
+    players.forEach(p => {
+
+        container.append(`
+            <div class="player-row">
+                <span>${p.name}</span>
+                <span class="player-id">[SIG_${p.id}]</span>
+            </div>
+        `);
+
+    });
+
+}
+
+// ==========================================
+// [05] SOLO JOB RENDER
+// ==========================================
+function loadSoloJobs() {
+
+    const container = $('#jobListArea');
+    container.empty();
+
+    if (soloJobList.length === 0) {
+        container.append('<div class="job-lock-overlay"><span>NO CONTRACTS AVAILABLE</span></div>');
+        return;
+    }
+
+    soloJobList.forEach(function (job) {
+
+        const reqRank = job.level || 1;
+        const isLocked = playerLevel < reqRank;
+        let activeClass = (currentJobId === job.id) ? 'active' : '';
+
+        let html = `
+        <div class="trailerItem ${isLocked ? 'locked' : ''} ${activeClass}" data-id="${job.id}">
+            ${isLocked ? `<div class="locked-overlay">REQUIRED RANK ${reqRank}</div>` : ''}
+            <div class="trailerImg"><img src="${job.imgSrc}"></div>
+            <div class="trailerInfo">
+                <div class="trailerName">${job.name}</div>
+                <div class="trailerRoute">${job.streetNames || "INDUSTRIAL"}</div>
+            </div>
+            <div class="trailerStats">
+                <div class="trailerPrice">$${job.totalPrice}</div>
+                <div class="trailerDist">${job.distance || 5} KM</div>
+            </div>
+        </div>
+        `;
+
+        const $item = $($.parseHTML(html));
+
+        $item.on('click', function () {
+
+            if (isLocked) return;
+
+            currentJobId = job.id;
+
+            $('#jobListArea .trailerItem').removeClass('active');
+            $(this).addClass('active');
+
+            $('.popUpText').html(`AUTHORIZE CONTRACT: <span style="color:#00d2ff">${job.name}</span>?`);
+            $('.popUp').fadeIn(200);
+
+        });
+
+        container.append($item);
+
+    });
+
+}
+
+// ==========================================
+// [06] CONVOY JOB RENDER
+// ==========================================
+function loadConvoyJobs() {
+
+    const container = $('#lobbyMissionInfo');
+    container.empty();
+
+    if (!currentConvoyID) {
+        container.html('<div class="no-mission">WAITING FOR CONVOY...</div>');
+        return;
+    }
+
+    if (!isLeader) {
+        container.html('<div class="no-mission">LEADER SELECTING CONTRACT...</div>');
+        return;
+    }
+
+    if (convoyJobList.length === 0) {
+        container.html('<div class="no-mission">NO CONVOY JOBS</div>');
+        return;
+    }
+
+    container.html('<div class="convoy-job-scroll"></div>');
+    const scroll = container.find('.convoy-job-scroll');
+
+    convoyJobList.forEach(function (job) {
+
+        let activeClass = (currentJobId === job.id) ? 'active' : '';
+
+        const html = `
+        <div class="convoy-job-item ${activeClass}" data-id="${job.id}">
+            <div class="convoy-job-name">${job.name}</div>
+            <div class="convoy-job-details">
+                <span>$${job.totalPrice}</span>
+                <span>${job.distance} KM</span>
+                <span>RANK ${job.level || 1}</span>
+            </div>
+        </div>
+        `;
+
+        const $item = $($.parseHTML(html));
+
+        $item.on('click', function () {
+
+            if (!isLeader) return;
+
+            currentJobId = job.id;
+
+            $('.convoy-job-item').removeClass('active');
+            $(this).addClass('active');
+
+            $.post(`https://${GetParentResourceName()}/selectJob`, JSON.stringify({
+                convoyID: currentConvoyID,
+                jobData: job
+            }));
+
+            updateStartButtonState();
+
+        });
+
+        scroll.append($item);
+
+    });
+
+}
+
+// ==========================================
+// [07] UI HELPERS
+// ==========================================
+function updateLevelUI(xp, level) {
+
+    playerLevel = level;
+
+    $('#levelStatus').css('width', xp + '%');
+    $('#levelText').text(`RANK ${level} [${xp}/100 XP]`);
+
+}
+
+function closeMenu() {
+
+    $('#ui-wrapper, .popUp').fadeOut(200, function () {
+        $(this).hide();
+    });
+
+    $.post(`https://${GetParentResourceName()}/closeUI`, JSON.stringify({}));
+
+    currentJobId = null;
+
+}
